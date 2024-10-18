@@ -69,9 +69,9 @@ function EditLayoutPage(): React.JSX.Element {
   const handleRemoveRoute = async () => {
     if (deleteIndex !== null) {
       const routeId = routes[deleteIndex]._id;
-      if (routeId && layout) {
-        await apiService.removeRouteFromLayout(layout._id, routeId);
-      }
+      // if (routeId && layout) {
+        // await apiService.removeRouteFromLayout(layout._id, routeId);
+      // }
       const newRoutes = routes.filter((_, i) => i !== deleteIndex);
       setRoutes(newRoutes);
       setDeleteIndex(null); // Reset delete index after deletion

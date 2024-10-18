@@ -34,26 +34,27 @@ export default function LayoutDetails(): React.JSX.Element {
   const [error, setError] = useState<string | null>(null);
 
   const handleToggleRouteUsage = async (isCurrentlyUsed: boolean, layout_id?: string, route_id?: string) => {
-    if (route_id && layout_id) {
-      try {
-        const response = await apiService.updateLayoutRoute(layout_id, route_id, { isCurrentlyUsed });
-        if (response.data.success) {
-          setLayout((prevLayout) => {
-            if (!prevLayout) return prevLayout;
-            const updatedRoutes = prevLayout.routes.map((route) =>
-              route._id === route_id ? { ...route, isCurrentlyUsed } : route
-            );
-            return { ...prevLayout, routes: updatedRoutes };
-          });
-        }
-      } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('An unknown error occurred');
-        }
-      }
-    }
+	console.log("");
+    // if (route_id && layout_id) {
+      // try {
+        // const response = await apiService.updateLayoutRoute(layout_id, route_id, { isCurrentlyUsed });
+        // if (response.data.success) {
+          // setLayout((prevLayout) => {
+            // if (!prevLayout) return prevLayout;
+            // const updatedRoutes = prevLayout.routes.map((route) =>
+              // route._id === route_id ? { ...route, isCurrentlyUsed } : route
+            // );
+            // return { ...prevLayout, routes: updatedRoutes };
+          // });
+        // }
+      // } catch (err) {
+        // if (err instanceof Error) {
+          // setError(err.message);
+        // } else {
+          // setError('An unknown error occurred');
+        // }
+      // }
+    // }
   };
 
   const fetchLayout = async (id: string) => {

@@ -78,7 +78,7 @@ class ApiService {
 
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: 'http://localhost:5001/api', // Replace with your actual base URL
+      baseURL: 'https://guideplusapi.cleartouchmedia.com/api', // Replace with your actual base URL
     });
   }
 
@@ -108,11 +108,11 @@ class ApiService {
 
   // Carousel API Methods
   getCarousels(): Promise<any> {
-    return this.axiosInstance.get('/carousel');
+    return this.axiosInstance.get('/carousels');
   }
 
   getCarouselById(id: string): Promise<AxiosResponse<any>> {
-    return this.axiosInstance.get(`/carousel/${id}`);
+    return this.axiosInstance.get(`/carousels/${id}`);
   }
 
   createCarousel(data: { name: string; images: Image[] }): Promise<any> {
@@ -120,19 +120,19 @@ class ApiService {
   }
 
   updateCarousel(id: string, data: Partial<Carousel>): Promise<any> {
-    return this.axiosInstance.put(`/carousel/${id}`, data);
+    return this.axiosInstance.put(`/carousels/${id}`, data);
   }
 
   deleteCarousel(id: string): Promise<any> {
-    return this.axiosInstance.delete(`/carousel/${id}`);
+    return this.axiosInstance.delete(`/carousels/${id}`);
   }
 
   addImageToCarousel(carouselId: string, data: Image): Promise<any> {
-    return this.axiosInstance.post(`/carousel/${carouselId}/images`, data);
+    return this.axiosInstance.post(`/carousels/${carouselId}/images`, data);
   }
 
   removeImageFromCarousel(carouselId: string, imageId: string): Promise<any> {
-    return this.axiosInstance.delete(`/carousel/${carouselId}/images/${imageId}`);
+    return this.axiosInstance.delete(`/carousels/${carouselId}/images/${imageId}`);
   }
 
   // History API Methods
