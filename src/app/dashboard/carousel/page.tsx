@@ -82,7 +82,7 @@ function CarouselListPage(): React.JSX.Element {
         </Box>
       </Stack>
       <Grid container spacing={4}>
-        {carousels?.map((carousel: any) => (
+        {carousels?.data?.map((carousel: any) => (
           <Grid item xs={12} sm={6} md={4} key={carousel._id}>
             <Card sx={{ p: 1, height: 350 }}>
               <CardContent>

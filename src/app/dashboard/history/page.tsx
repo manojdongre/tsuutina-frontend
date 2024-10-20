@@ -132,7 +132,7 @@ function HistoryManagementPage(): React.JSX.Element {
         </Box>
       </Stack>
 
-      {historyItems.map((item) => (
+      {historyItems?.data?.map((item) => (
         <Card key={item._id} sx={{ mb: 2, p: 2 }}>
           <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
             <img src={item.imageUrl} alt={item.title} width={150} height={150} style={{ borderRadius: '12px' }} />

@@ -89,9 +89,9 @@ export default function LayoutDetails(): React.JSX.Element {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" sx={{ mb: 2 }}>
-        {layout.name}
+        {layout?.data.name}
       </Typography>
-      {layout.routes.map((route) => (
+      {layout?.data.routes.map((route) => (
         <Card key={route._id} sx={{ p: 2, mb: 2 }}>
           <Typography fontWeight={700}>{route.name}</Typography>
           <Typography>{route.path}</Typography>

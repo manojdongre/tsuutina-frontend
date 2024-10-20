@@ -86,9 +86,9 @@ export default function LayoutList({ onEditLayoutClick, refreshTrigger }: Layout
   return (
     <Container maxWidth="xl">
       {error ? <Typography color="error">{error}</Typography> : null}
-      {layouts?.length === 0 && <Typography>No layouts found</Typography>}
+      {layouts?.data?.length === 0 && <Typography>No layouts found</Typography>}
       <Grid container spacing={10}>
-        {layouts?.map((layout) => (
+        {layouts?.data?.map((layout) => (
           <Grid key={layout._id} item xs={12} sm={6} md={4}>
             <Card
               key={layout._id}

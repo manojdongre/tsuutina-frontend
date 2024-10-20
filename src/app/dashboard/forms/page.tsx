@@ -87,13 +87,13 @@ router.push(`/dashboard/forms/${form._id}/response`),
       }
     },[currentForm]);
 
-useEffect(() => {
-  forms.forEach(form => {
-    FetchResponseCountByFormId(form._id).then(count => {
-      setResponseCounts(prev => ({ ...prev, [form._id]: count }));
-    });
-  });
-}, [forms]);
+// useEffect(() => {
+  // forms.forEach(form => {
+    // FetchResponseCountByFormId(form._id).then(count => {
+      // setResponseCounts(prev => ({ ...prev, [form._id]: count }));
+    // });
+  // });
+// }, [forms]);
 
 
     
@@ -129,8 +129,6 @@ useEffect(() => {
                   <Box>
                   <Typography variant="h6">{form.title}</Typography>
                   <Typography variant="body2">{form.description}</Typography>
-                  <Typography variant="body2"><span style={{color:'black'}}>Total Response {responseCounts[form._id]}</span></Typography>
-
                   </Box>
 
                   <Button title='View Response' variant='contained' onClick={()=>handleViewResponse(form)}>
