@@ -78,7 +78,8 @@ class ApiService {
 
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: 'https://guideplusapi.cleartouchmedia.com/api', // Replace with your actual base URL
+      // baseURL: 'https://guideplusapi.cleartouchmedia.com/api', // Replace with your actual base URL
+      baseURL: 'http://localhost:5001/api',
     });
   }
 
@@ -104,11 +105,19 @@ class ApiService {
     return this.axiosInstance.delete(`/layouts/${id}`);
   }
 
+  setLayout(id: string): Promise<AxiosResponse<ApiResponse<Layout>>> {
+    return this.axiosInstance.put(`/layouts/${id}/activate`);
+  }
+
   //Form api methods
 
   // Carousel API Methods
   getCarousels(): Promise<any> {
     return this.axiosInstance.get('/carousel');
+  }
+
+  activateCarousel(id: string): Promise<AxiosResponse<ApiResponse<any>>> {
+    return this.axiosInstance.put(`/carousel/${id}/activate`);
   }
 
   getCarouselById(id: string): Promise<AxiosResponse<any>> {
@@ -117,6 +126,10 @@ class ApiService {
 
   createCarousel(data: { name: string; images: Image[] }): Promise<any> {
     return this.axiosInstance.post('/carousel', data);
+  }
+
+  uploadCarousel(data: any): Promise<any> {
+    return this.axiosInstance.post('/carousel/upload', data);
   }
 
   updateCarousel(id: string, data: Partial<Carousel>): Promise<any> {
@@ -216,7 +229,16 @@ class ApiService {
 
   // Set a form as current
   setFormAsCurrent(formId: string): Promise<AxiosResponse<ApiResponse<Form>>> {
-    return this.axiosInstance.put(`/forms/set-active/${formId}`);
+    return this.axiosInstance.put(`/forms/${formId}/set-active`);
+  }
+
+  //get response by form id
+  getResponsesByFormId(formId: string): Promise<AxiosResponse<ApiResponse<any>>> {
+    return this.axiosInstance.get(`/responses/${formId}`);
+  }
+
+  createResponse(formId: string, data: any): Promise<ApiResponse<ApiResponse<any>>> {
+    return this.axiosInstance.post(`/responses/submit/${formId}`, data);
   }
 }
 

@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import apiService, { type Form } from '@/services/api-service';
+import apiService from '@/services/api-service';
 import { Button, Card, Grid, Stack, Typography } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 interface FormListProps {
-  onEditFormClick: (form: Form) => void;
+  onEditFormClick: (form: any) => void;
   refreshTrigger: number;
 }
 
 export function FormList({ onEditFormClick, refreshTrigger }: FormListProps): React.JSX.Element {
-  const [forms, setForms] = useState<Form[]>([]);
+  const [forms, setForms] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const fetchForms = async (): Promise<any> => {
     try {
@@ -31,7 +31,7 @@ export function FormList({ onEditFormClick, refreshTrigger }: FormListProps): Re
             <Card sx={{ p: 3 }}>
               <Typography variant="h5">{form.title}</Typography>
               <Typography>{form?.description}</Typography>
-              <Typography mb={2}>Fields: {form?.fields?.map((field) => field.label).join(', ')}</Typography>
+              <Typography mb={2}>Fields: {form?.fields?.map((field: any) => field.label).join(', ')}</Typography>
               <Stack direction="row" spacing={2}>
                 <Button
                   variant="contained"

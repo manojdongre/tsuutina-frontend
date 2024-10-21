@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import apiService from '@/services/api-service';
 import {
   Container,
   Paper,
@@ -12,12 +13,20 @@ import {
   Typography,
 } from '@mui/material';
 
-// Define the ResponseData interface
+// Define the interfaces
+interface FormField {
+  label: string;
+  _id: string;
+}
+
 interface ResponseData {
   _id: string;
   formId: string;
-  responses: Record<string, string>;
-  createdAt: string;
+  responses: {
+    label: string;
+    value: string;
+  }[];
+  submittedAt: string;
 }
 
 const ResponsesTable: React.FC = () => {
@@ -26,58 +35,31 @@ const ResponsesTable: React.FC = () => {
   const params = useParams();
   const formId = params.id as string;
 
-  // Dummy data simulating API response
-  const dummyData: ResponseData[] = [
-    {
-      _id: '1',
-      formId: formId,
-      responses: {
-        name: 'Shubham',
-        age: '22',
-        gender: 'Male',
-      },
-      createdAt: new Date().toISOString(),
-    },
-    {
-      _id: '2',
-      formId: formId,
-      responses: {
-        name: 'Vineet',
-        age: '30',
-        gender: 'Male',
-      },
-      createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-    },
-    {
-      _id: '3',
-      formId: formId,
-      responses: {
-        name: 'Manoj',
-        age: '32',
-        gender: 'Male',
-      },
-      createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-    },
-  ];
+  // Fetch form structure to get labels
+  const fetchFormLabels = async () => {
+    try {
+      const response = await apiService.getFormById(formId);
+      const labels = response.data.data.fields.map((field: any) => field.label);
+      setColumns(labels.concat(['submittedAt'])); // Add 'submittedAt' as a column
+    } catch (error) {
+      console.error('Error fetching form labels:', error);
+    }
+  };
+
+  // Fetch responses for the form
+  const fetchFormResponses = async () => {
+    try {
+      const response = await apiService.getResponsesByFormId(formId);
+      setData(response.data.data.responses);
+    } catch (error) {
+      console.error('Error fetching form responses:', error);
+    }
+  };
 
   useEffect(() => {
-    // Simulating fetching data
-    const fetchResponses = async () => {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Set dummy data
-      setData(dummyData);
-
-      // Setting dynamic columns based on the first response
-      if (dummyData.length > 0) {
-        const dynamicColumns = Object.keys(dummyData[0].responses).concat(['createdAt']);
-        setColumns(dynamicColumns);
-      }
-    };
-
-    fetchResponses();
-  }, []);
+    fetchFormLabels();
+    fetchFormResponses();
+  }, [formId]);
 
   return (
     <Container>
@@ -89,18 +71,21 @@ const ResponsesTable: React.FC = () => {
           <TableHead>
             <TableRow>
               {columns.map((column) => (
-                <TableCell key={column}>{column.replace(/_/g, ' ')}</TableCell>
+                <TableCell key={column}>{column}</TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
             {data.map((row) => (
               <TableRow key={row._id}>
-                {columns.map((column) => (
-                  <TableCell key={column}>
-                    {column === 'createdAt' ? new Date().toLocaleString() : row.responses[column] ?? ''}
-                  </TableCell>
-                ))}
+                {columns.map((column) => {
+                  const response = row.responses.find((r) => r.label === column);
+                  return (
+                    <TableCell key={column}>
+                      {column === 'submittedAt' ? new Date(row.submittedAt).toLocaleString() : response?.value || ''}
+                    </TableCell>
+                  );
+                })}
               </TableRow>
             ))}
           </TableBody>
@@ -110,4 +95,4 @@ const ResponsesTable: React.FC = () => {
   );
 };
 
-export default ResponsesTable;
+export default ResponsesTable;

@@ -1,27 +1,28 @@
-"use client";
-import React, { useState, useEffect } from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import apiService from '@/services/api-service';
 import {
-  Container,
-  TextField,
+  Box,
   Button,
   Checkbox,
+  Container,
+  FormControl,
   FormControlLabel,
+  FormGroup,
+  MenuItem,
   Radio,
   RadioGroup,
   Select,
-  MenuItem,
-  Box,
+  TextField,
   Typography,
-  FormControl,
-  FormGroup,
 } from '@mui/material';
-import apiService, { type Form } from '@/services/api-service';
-import { useParams, useRouter } from 'next/navigation';
 
 function PreviewFormComponent() {
   const params = useParams();
   const router = useRouter();
-  const [form, setForm] = useState<Form | null>(null);
+  const [form, setForm] = useState<any | null>(null);
   const [responses, setResponses] = useState<any>({});
   const formId = params.id as string;
 
@@ -36,7 +37,6 @@ function PreviewFormComponent() {
   }, [formId]);
 
   const handleChange = (fieldId: string, value: any) => {
-    console.log(value);
     setResponses({
       ...responses,
       [fieldId]: value,
@@ -45,8 +45,17 @@ function PreviewFormComponent() {
 
   const handleSubmit = async () => {
     try {
-      console.log(responses);
-      await apiService.createResponse(formId, responses);
+      // Convert responses into API expected format
+      const formattedResponses = Object.keys(responses).map((fieldId) => {
+        const field = form?.fields.find((f: any) => f._id === fieldId);
+        return {
+          label: field?.label || '',
+          value: responses[fieldId],
+        };
+      });
+
+      // Send formatted response
+      await apiService.createResponse(formId, { responses: formattedResponses });
       router.push('/dashboard/forms');
       alert('Form submitted successfully!');
     } catch (error) {
@@ -66,20 +75,24 @@ function PreviewFormComponent() {
       </Typography>
       {form?.fields.map((field: any) => (
         <Box key={field._id} mb={3}>
-          <Typography variant="body1" mb={1}>{field.label}</Typography>
+          <Typography variant="body1" mb={1}>
+            {field.label}
+          </Typography>
+          {/* Text Field */}
           {field.type === 'text' && (
             <TextField
               fullWidth
               value={responses[field._id] || ''}
-              onChange={(e) => { handleChange(field._id, e.target.value); }}
+              onChange={(e) => handleChange(field._id, e.target.value)}
               required={field.required}
             />
           )}
+          {/* Select Field */}
           {field.type === 'select' && (
             <Select
               fullWidth
               value={responses[field._id] || ''}
-              onChange={(e) => { handleChange(field._id, e.target.value); }}
+              onChange={(e) => handleChange(field._id, e.target.value)}
               required={field.required}
             >
               {field.options.map((option: any, index: number) => (
@@ -89,6 +102,7 @@ function PreviewFormComponent() {
               ))}
             </Select>
           )}
+          {/* Checkbox Field */}
           {field.type === 'checkbox' && (
             <FormControl>
               <FormGroup>
@@ -112,19 +126,12 @@ function PreviewFormComponent() {
               </FormGroup>
             </FormControl>
           )}
+          {/* Radio Field */}
           {field.type === 'radio' && (
             <FormControl component="fieldset">
-              <RadioGroup
-                value={responses[field._id] || ''}
-                onChange={(e) => { handleChange(field._id, e.target.value); }}
-              >
+              <RadioGroup value={responses[field._id] || ''} onChange={(e) => handleChange(field._id, e.target.value)}>
                 {field.options.map((option: any, index: number) => (
-                  <FormControlLabel
-                    key={index}
-                    value={option}
-                    control={<Radio />}
-                    label={option}
-                  />
+                  <FormControlLabel key={index} value={option} control={<Radio />} label={option} />
                 ))}
               </RadioGroup>
             </FormControl>
@@ -139,3 +146,7 @@ function PreviewFormComponent() {
 }
 
 export default PreviewFormComponent;
+
+PreviewFormComponent.getLayout = function getLayout(page: React.ReactElement) {
+  return page; // no layout applied
+};

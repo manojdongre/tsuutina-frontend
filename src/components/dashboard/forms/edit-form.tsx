@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import apiService, { type Form } from '@/services/api-service';
+import apiService from '@/services/api-service';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Button,
@@ -16,12 +16,12 @@ import {
 interface EditFormProps {
   open: boolean;
   onClose: () => void;
-  form: Form;
+  form: any;
   onUpdate: () => void;
 }
 
 export function EditForm({ open, onClose, form, onUpdate }: EditFormProps): React.JSX.Element {
-  const [editedForm, setEditedForm] = useState<Form>(form);
+  const [editedForm, setEditedForm] = useState<any>(form);
 
   useEffect(() => {
     setEditedForm(form);
@@ -29,12 +29,14 @@ export function EditForm({ open, onClose, form, onUpdate }: EditFormProps): Reac
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setEditedForm((prevForm) => ({ ...prevForm, [name]: value }));
+    setEditedForm((prevForm: any) => ({ ...prevForm, [name]: value }));
   };
 
   const handleFieldChange = (index: number, key: string, value: any) => {
-    const updatedFields = editedForm.fields.map((field, i) => (i === index ? { ...field, [key]: value } : field));
-    setEditedForm((prevForm) => ({ ...prevForm, fields: updatedFields }));
+    const updatedFields = editedForm.fields.map((field: any, i: number) =>
+      i === index ? { ...field, [key]: value } : field
+    );
+    setEditedForm((prevForm: any) => ({ ...prevForm, fields: updatedFields }));
   };
 
   const handleAddField = () => {
@@ -46,15 +48,15 @@ export function EditForm({ open, onClose, form, onUpdate }: EditFormProps): Reac
       isActive: true,
       _id: `${Date.now()}`, // Temporary ID until saved
     };
-    setEditedForm((prevForm) => ({
+    setEditedForm((prevForm: any) => ({
       ...prevForm,
       fields: [...prevForm.fields, newField],
     }));
   };
 
   const handleRemoveField = (index: number) => {
-    const updatedFields = editedForm.fields.filter((_, i) => i !== index);
-    setEditedForm((prevForm) => ({ ...prevForm, fields: updatedFields }));
+    const updatedFields = editedForm.fields.filter((_: any, i: any) => i !== index);
+    setEditedForm((prevForm: any) => ({ ...prevForm, fields: updatedFields }));
   };
 
   const handleUpdate = async () => {
@@ -129,7 +131,7 @@ export function EditForm({ open, onClose, form, onUpdate }: EditFormProps): Reac
         <Stack spacing={2}>
           <TextField label="Title" name="title" value={editedForm.title} onChange={handleChange} />
           <TextField label="Description" name="description" value={editedForm.description} onChange={handleChange} />
-          {editedForm.fields.map((field, index) => (
+          {editedForm.fields.map((field: any, index: any) => (
             <div key={field._id}>{renderFieldInput(field, index)}</div>
           ))}
           <Button variant="outlined" onClick={handleAddField}>

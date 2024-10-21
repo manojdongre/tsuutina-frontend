@@ -9,17 +9,17 @@ interface Directory {
   _id?: string;
   name: string;
   address: string;
-  phoneNumber: string;
+  phone: string;
   email: string;
   website: string;
-  image?: string;
+  imageUrl?: string;
   hours: string;
   iframe: string;
 }
 
 function DirectoryListPage() {
   const router = useRouter();
-  const [directories, setDirectories] = useState<Directory[]>([]);
+  const [directories, setDirectories] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -48,7 +48,9 @@ function DirectoryListPage() {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => { router.push('/dashboard/directory/create'); }}
+        onClick={() => {
+          router.push('/dashboard/directory/create');
+        }}
         sx={{ mb: 3 }}
       >
         Create New Directory
@@ -60,11 +62,17 @@ function DirectoryListPage() {
               <Box sx={{ flexGrow: 1 }}>
                 <Typography variant="h6">{directory.name}</Typography>
                 <Typography variant="body1">{directory.address}</Typography>
-                <Typography variant="body1">{directory.phoneNumber}</Typography>
+                <Typography variant="body1">{directory.phone}</Typography>
                 <Typography variant="body1">{directory.website}</Typography>
                 <Typography variant="body1">{directory.hours}</Typography>
               </Box>
-              <Button variant="outlined" onClick={() => { router.push(`/dashboard/directory/${directory._id}`); }}>
+              <img src={directory.imageUrl} style={{ width: '200px', height: '200px' }} />
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  router.push(`/dashboard/directory/${directory._id}`);
+                }}
+              >
                 View / Edit
               </Button>
             </ListItem>

@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
+import Swal from 'sweetalert2';
+
+import UploadContainer from '../upload-container';
 
 interface DirectoryFormProps {
   initialData?: {
@@ -8,7 +11,7 @@ interface DirectoryFormProps {
     phone: string;
     website: string;
     hours: string;
-    iframe: string;
+    imageUrl: string;
   };
   onSubmit: (data: {
     name: string;
@@ -16,7 +19,7 @@ interface DirectoryFormProps {
     phone: string;
     website: string;
     hours: string;
-    iframe: string;
+    imageUrl: string;
   }) => void;
 }
 
@@ -27,7 +30,7 @@ const DirectoryForm: React.FC<DirectoryFormProps> = ({ initialData, onSubmit }) 
     phone: '',
     website: '',
     hours: '',
-    iframe: '',
+    imageUrl: '',
   });
 
   useEffect(() => {
@@ -47,6 +50,25 @@ const DirectoryForm: React.FC<DirectoryFormProps> = ({ initialData, onSubmit }) 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     onSubmit(formData);
+  };
+
+  const handleImageUploadSuccess = async (url: string) => {
+    console.log('Uploaded Image URL:', url);
+
+    Swal.fire({
+      title: 'Image Upload Success',
+      text: 'The image has been uploaded successfully.',
+      icon: 'success',
+      confirmButtonText: 'Okay',
+    });
+
+    // Update the directory's imageUrl field
+    setFormData((prevDirectory: any) => {
+      if (prevDirectory) {
+        return { ...prevDirectory, imageUrl: url };
+      }
+      return prevDirectory;
+    });
   };
 
   return (
@@ -99,18 +121,8 @@ const DirectoryForm: React.FC<DirectoryFormProps> = ({ initialData, onSubmit }) 
         required
         sx={{ mb: 2 }}
       />
-      <TextField
-        label="Iframe"
-        name="iframe"
-        value={formData.iframe}
-        onChange={handleChange}
-        fullWidth
-        required
-        multiline
-        rows={4}
-        sx={{ mb: 2 }}
-      />
-      <Button variant="contained" color="primary" type="submit">
+      <UploadContainer uploadType="history" onUploadSuccess={handleImageUploadSuccess} />
+      <Button sx={{ mt: 2 }} variant="contained" color="primary" type="submit">
         Save
       </Button>
     </Box>

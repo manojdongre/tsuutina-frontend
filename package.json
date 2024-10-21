@@ -1,9 +1,8 @@
 {
   "name": "material-kit-react",
   "version": "4.0.0",
-  "author": "Devias",
+  "author": "Shubham Joshi",
   "licence": "MIT",
-  "homepage": "https://devias.io",
   "private": false,
   "scripts": {
     "dev": "next dev",
@@ -34,6 +33,7 @@
     "@phosphor-icons/react": "2.1.6",
     "apexcharts": "3.49.2",
     "axios": "^1.7.2",
+    "babel-loader": "^9.2.1",
     "dayjs": "1.11.11",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",

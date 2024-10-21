@@ -31,7 +31,7 @@ interface LayoutListProps {
 }
 
 export default function LayoutList({ onEditLayoutClick, refreshTrigger }: LayoutListProps): React.JSX.Element {
-  const [layouts, setLayouts] = useState<Layout[]>([]);
+  const [layouts, setLayouts] = useState<any>([]);
   const [error, setError] = useState<string | null>(null);
 
   const fetchLayout = async () => {
@@ -58,7 +58,7 @@ export default function LayoutList({ onEditLayoutClick, refreshTrigger }: Layout
     apiService
       .deleteLayout(id)
       .then((response: AxiosResponse<ApiResponse<Layout>>) => {
-        setLayouts(layouts.filter((layout) => layout._id !== id));
+        setLayouts(layouts.data.filter((layout: any) => layout._id !== id));
       })
       .catch((err) => {
         if (err instanceof Error) {
@@ -74,6 +74,7 @@ export default function LayoutList({ onEditLayoutClick, refreshTrigger }: Layout
       await apiService.setLayout(id);
       const response = await apiService.getLayouts();
       setLayouts(response.data.data);
+      fetchLayout();
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -88,8 +89,9 @@ export default function LayoutList({ onEditLayoutClick, refreshTrigger }: Layout
       {error ? <Typography color="error">{error}</Typography> : null}
       {layouts?.data?.length === 0 && <Typography>No layouts found</Typography>}
       <Grid container spacing={10}>
-        {layouts?.data?.map((layout) => (
+        {layouts?.data?.map((layout: any) => (
           <Grid key={layout._id} item xs={12} sm={6} md={4}>
+            {layout?.isCurrentlySet}
             <Card
               key={layout._id}
               sx={{
@@ -102,7 +104,7 @@ export default function LayoutList({ onEditLayoutClick, refreshTrigger }: Layout
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Box>
                   <Typography fontWeight={700}>{layout.name}</Typography>
-                  <Typography>{layout.routes.map((route) => route.name).join(', ')}</Typography>
+                  <Typography>{layout.routes.map((route: any) => route.name).join(', ')}</Typography>
                 </Box>
                 <IconButton
                   onClick={() => {

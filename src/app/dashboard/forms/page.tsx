@@ -1,15 +1,16 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import apiService from '@/services/api-service';
 import { Box, Button, Card, CardContent, Container, Grid, Stack, Typography } from '@mui/material';
 import { Plus as PlusIcon } from '@phosphor-icons/react';
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
+
 import AddForm from '@/components/dashboard/forms/add-form';
 import EditForm from '@/components/dashboard/forms/edit-form';
 import FormList from '@/components/dashboard/forms/form-list';
 import ViewResponses from '@/components/dashboard/forms/view-response';
-import apiService from '@/services/api-service';
-import { useRouter } from 'next/navigation';
 
 export default function ManageForms(): React.JSX.Element {
   const [editFormOpen, setEditFormOpen] = useState<boolean>(false);
@@ -19,7 +20,7 @@ export default function ManageForms(): React.JSX.Element {
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
   const [forms, setForms] = useState<any[]>([]);
   const [currentForm, setCurrentForm] = useState<any | null>(null);
-const [responseCounts, setResponseCounts] = useState<Record<string, number>>({});
+  const [responseCounts, setResponseCounts] = useState<Record<string, number>>({});
 
   const router = useRouter();
   const handleAddFormClick = () => {
@@ -28,13 +29,13 @@ const [responseCounts, setResponseCounts] = useState<Record<string, number>>({})
 
   const fetchForms = async () => {
     await apiService.getForms().then((response) => {
-        setForms(response.data.data);
+      setForms(response.data.data);
     });
   };
 
   const handleEditFormClick = (form: any) => {
     router.push(`/dashboard/forms/${form._id}/edit`);
-  }
+  };
 
   const handleViewResponsesClick = (form: any) => {
     setSelectedForm(form);
@@ -43,15 +44,13 @@ const [responseCounts, setResponseCounts] = useState<Record<string, number>>({})
 
   const handlePreviewFormClick = (form: any) => {
     router.push(`/dashboard/forms/${form._id}/preview`);
-  }
+  };
 
   const handleUpdate = () => {
     setRefreshTrigger((prev) => prev + 1);
   };
 
-  const handleViewResponse = (form:any) =>[
-router.push(`/dashboard/forms/${form._id}/response`),
-  ]
+  const handleViewResponse = (form: any) => [router.push(`/dashboard/forms/${form._id}/response`)];
 
   const FetchResponseCountByFormId = (formId: string) =>
     apiService.fetchCountByFormId(formId).then((response) => {
@@ -61,48 +60,61 @@ router.push(`/dashboard/forms/${form._id}/response`),
       return 0;
     });
 
-    useEffect(() => {
-      fetchForms();
-    }, []);
-  
-
-    useEffect(()=>{
-      if(currentForm) {
-        try{
-          apiService.setFormAsCurrent(currentForm);
-          Swal.fire({
-            title: "Success!",
-            text: "Selected form Set as current form!",
-            icon: "success"
-          });
-          fetchForms();
-        }
-        catch(err:any) {
-          Swal.fire({
-            title: "Error!",
-            text: err.message,
-            icon: "error"
-          });
-        }
-      }
-    },[currentForm]);
-
-// useEffect(() => {
-  // forms.forEach(form => {
-    // FetchResponseCountByFormId(form._id).then(count => {
-      // setResponseCounts(prev => ({ ...prev, [form._id]: count }));
-    // });
-  // });
-// }, [forms]);
-
-
-    
   useEffect(() => {
     fetchForms();
   }, []);
 
-  console.log(responseCounts)
+  const setAsActive = async (formId: string) => {
+    try {
+      await apiService.setFormAsCurrent(formId); // Pass formId instead of currentForm
+      Swal.fire({
+        title: 'Success!',
+        text: 'Selected form set as the current form!',
+        icon: 'success',
+      });
+      fetchForms(); // Refresh form list after setting form as active
+    } catch (err: any) {
+      Swal.fire({
+        title: 'Error!',
+        text: err.message,
+        icon: 'error',
+      });
+    }
+  };
 
+  useEffect(() => {
+    if (currentForm) {
+      try {
+        apiService.setFormAsCurrent(currentForm);
+        Swal.fire({
+          title: 'Success!',
+          text: 'Selected form Set as current form!',
+          icon: 'success',
+        });
+        fetchForms();
+      } catch (err: any) {
+        Swal.fire({
+          title: 'Error!',
+          text: err.message,
+          icon: 'error',
+        });
+      }
+    }
+  }, [currentForm]);
+
+  // useEffect(() => {
+  // forms.forEach(form => {
+  // FetchResponseCountByFormId(form._id).then(count => {
+  // setResponseCounts(prev => ({ ...prev, [form._id]: count }));
+  // });
+  // });
+  // }, [forms]);
+
+  useEffect(() => {
+    fetchForms();
+  }, []);
+
+  console.log(responseCounts);
 
   return (
     <Container maxWidth="xl">
@@ -122,45 +134,73 @@ router.push(`/dashboard/forms/${form._id}/response`),
       </Stack>
       <Grid container spacing={3}>
         {forms?.map((form) => (
-          <Grid  key ={form._id} item xs={12} md={6} lg={12}>
-            <Card sx={{border: form.isActive ? '1px solid green' : 'none', background: form.isActive ? '#F5FFFA' : '#FFF0F5'}}>
+          <Grid key={form._id} item xs={12} md={6} lg={12}>
+            <Card
+              sx={{
+                border: form.isActive ? '1px solid green' : 'none',
+                background: form.isActive ? '#F5FFFA' : '#FFF0F5',
+              }}
+            >
               <CardContent>
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                   <Box>
-                  <Typography variant="h6">{form.title}</Typography>
-                  <Typography variant="body2">{form.description}</Typography>
+                    <Typography variant="h6">{form.title}</Typography>
+                    <Typography variant="body2">{form.description}</Typography>
                   </Box>
 
-                  <Button title='View Response' variant='contained' onClick={()=>handleViewResponse(form)}>
+                  <Button title="View Response" variant="contained" onClick={() => handleViewResponse(form)}>
                     View Response
                   </Button>
                 </Stack>
-    
+
                 <Stack direction="row" spacing={2}>
-                <Button variant="contained" color="primary" disabled={form.isActive===true} onClick={() => { setCurrentForm(form._id); }} sx={{ mt: 2 }}>
-                Set as Current
-              </Button>
-              <Button variant="contained" color="primary" onClick={() =>{handleEditFormClick(form)}} sx={{ mt: 2 }}>
-                Edit
-              </Button>
-              <Button variant="contained" color="primary" onClick={() => { handlePreviewFormClick(form); }} sx={{ mt: 2 }}>
-                Preview
-              </Button>
-              </Stack>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    disabled={form.isActive === true}
+                    onClick={() => {
+                      setAsActive(form._id);
+                    }}
+                    sx={{ mt: 2 }}
+                  >
+                    Set as Current
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      handleEditFormClick(form);
+                    }}
+                    sx={{ mt: 2 }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      handlePreviewFormClick(form);
+                    }}
+                    sx={{ mt: 2 }}
+                  >
+                    Preview
+                  </Button>
+                </Stack>
               </CardContent>
             </Card>
-            </Grid>
+          </Grid>
         ))}
-     
       </Grid>
-      {selectedForm ? <EditForm
+      {selectedForm ? (
+        <EditForm
           open={editFormOpen}
           onClose={() => {
             setEditFormOpen(false);
           }}
           form={selectedForm}
           onUpdate={handleUpdate}
-        /> : null}
+        />
+      ) : null}
     </Container>
   );
 }

@@ -18,7 +18,7 @@ interface Image {
 
 interface CarouselType {
   _id: string;
-  carouselName: string; // Changed from name to carouselName
+  carouselName: string;
   images: Image[];
   isActive: boolean;
 }
@@ -30,7 +30,6 @@ function CarouselListPage(): React.JSX.Element {
   const fetchCarousels = async () => {
     try {
       const response = await apiService.getCarousels();
-      console.log(response.data);
       setCarousels(response.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -38,11 +37,12 @@ function CarouselListPage(): React.JSX.Element {
   };
 
   const handleSetActive = async (carouselId: string) => {
-    // Example: implement logic to set a carousel active
     try {
-      // If you have a specific endpoint to set active
-      // await apiService.setCarouselActive(carouselId);
-      fetchCarousels(); // Refresh carousels after setting active
+      // Call the API to activate the carousel
+      const response = await apiService.activateCarousel(carouselId);
+      if (response.data.message === 'Carousel activated') {
+        fetchCarousels(); // Refresh carousels after setting active
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     }
@@ -88,18 +88,19 @@ function CarouselListPage(): React.JSX.Element {
               <CardContent>
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                   <Typography variant="h6">{carousel.carouselName}</Typography>
-                  {/* <Button
+                  <Button
                     variant="contained"
+                    color={carousel.isActive ? 'success' : 'primary'}
                     onClick={() => handleSetActive(carousel._id)}
-                    disabled={carousel.isActive}
+                    disabled={carousel.isCurrentlyActive} // Disable button if the carousel is already active
                   >
-                    {carousel.isActive ? 'Active' : 'Set as Active'}
+                    {carousel.isCurrentlyActive ? 'Active' : 'Set as Active'}
                   </Button>
                   <Link href={`/dashboard/carousel/edit-carousel?id=${carousel._id}`} passHref>
                     <Button variant="contained" color="secondary" sx={{ ml: 1 }}>
                       Edit Carousel
                     </Button>
-                  </Link> */}
+                  </Link>
                 </Stack>
               </CardContent>
               <CardMedia>
@@ -108,7 +109,11 @@ function CarouselListPage(): React.JSX.Element {
                     .filter((image: any) => image.isVisible)
                     .map((image: any, index: any) => (
                       <div key={index}>
-                        <img src={image.url} alt={`carousel-image-${index}`} />
+                        <img
+                          src={image.url}
+                          alt={`carousel-image-${index}`}
+                          style={{ objectFit: 'contain', height: '250px', width: '200px' }}
+                        />
                       </div>
                     ))}
                 </Carousel>

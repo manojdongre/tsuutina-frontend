@@ -6,6 +6,8 @@ import apiService from '@/services/api-service';
 import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
 import { Box, Button, Container, IconButton, Stack, TextField, Typography } from '@mui/material';
 
+import UploadContainer from '@/components/dashboard/upload-container';
+
 interface Image {
   _id?: string;
   url: string;
@@ -43,11 +45,7 @@ function EditCarouselPage(): React.JSX.Element {
       setName(carouselData.name);
       setImages(carouselData.images);
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred');
-      }
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
     }
   };
 
@@ -68,6 +66,11 @@ function EditCarouselPage(): React.JSX.Element {
     setImages(newImages);
   };
 
+  const handleUploadSuccess = (url: string, index: number) => {
+    const updatedImages = images.map((image, i) => (i === index ? { ...image, url } : image));
+    setImages(updatedImages);
+  };
+
   const handleSave = async () => {
     try {
       if (carousel) {
@@ -77,22 +80,25 @@ function EditCarouselPage(): React.JSX.Element {
         }
       }
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred');
-      }
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
     }
   };
 
   return (
     <Container>
-      {error ? <Typography color="error">{error}</Typography> : null}
+      {error && <Typography color="error">{error}</Typography>}
       <Typography variant="h4" sx={{ mb: 3 }}>
         Edit Carousel
       </Typography>
       <Box sx={{ mb: 3 }}>
-        <TextField label="Carousel Name" fullWidth value={name} onChange={(e) => { setName(e.target.value); }} />
+        <TextField
+          label="Carousel Name"
+          fullWidth
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value);
+          }}
+        />
       </Box>
 
       {images.map((image, index) => (
@@ -101,41 +107,46 @@ function EditCarouselPage(): React.JSX.Element {
             label="Image URL"
             fullWidth
             value={image.url}
-            onChange={(e) => { handleImageChange(index, e.target.value); }}
+            onChange={(e) => handleImageChange(index, e.target.value)}
           />
-          <IconButton onClick={() => { handleRemoveImage(index); }}>
+          <IconButton
+            onClick={() => {
+              handleRemoveImage(index);
+            }}
+          >
             <RemoveIcon />
           </IconButton>
+          {/* UploadContainer for image upload */}
+          <UploadContainer uploadType="carousel" onUploadSuccess={(url) => handleUploadSuccess(url, index)} />
         </Box>
       ))}
+
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <TextField
           label="New Image URL"
           fullWidth
           value={newImageUrl}
-          onChange={(e) => { setNewImageUrl(e.target.value); }}
+          onChange={(e) => {
+            setNewImageUrl(e.target.value);
+          }}
           onBlur={handleAddImage}
         />
         <IconButton onClick={handleAddImage}>
           <AddIcon />
         </IconButton>
       </Box>
+
       <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
         <Button variant="contained" color="primary" onClick={handleSave}>
           Save Carousel
         </Button>
-        <Button variant="outlined" onClick={() => { router.back(); }}>
-          Cancel
-        </Button>
         <Button
-          onClick={() =>
-            { router.push(
-              'https://www.google.com/maps/place/Grey+Eagle+Resort+and+Casino/@51.0074946,-114.1472472,17z/data=!3m1!4b1!4m9!3m8!1s0x537171edbde2ad0d:0x9ecba17eab6c70f2!5m2!4m1!1i2!8m2!3d51.0074946!4d-114.1472472!16s%2Fg%2F1tc_8bgd?entry=ttu'
-            ); }
-          }
-          variant="contained"
+          variant="outlined"
+          onClick={() => {
+            router.back();
+          }}
         >
-          hey
+          Cancel
         </Button>
       </Stack>
     </Container>

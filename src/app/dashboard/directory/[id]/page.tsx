@@ -9,7 +9,7 @@ interface DirectoryItem {
   _id?: string;
   name: string;
   address: string;
-  phoneNumber: string;
+  phone: string;
   email: string;
   website: string;
   image?: string;
@@ -21,7 +21,7 @@ function DirectoryDetailsPage(): React.JSX.Element {
   const router = useRouter();
   const { id } = useParams();
   console.log(id);
-  const [directory, setDirectory] = useState<DirectoryItem | null>(null);
+  const [directory, setDirectory] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ function DirectoryDetailsPage(): React.JSX.Element {
         {directory.name}
       </Typography>
       <Typography variant="body1">Address: {directory.address}</Typography>
-      <Typography variant="body1">Phone: {directory.phoneNumber}</Typography>
+      <Typography variant="body1">Phone: {directory.phone}</Typography>
       <Typography variant="body1">
         Website:{' '}
         <a href={`http://${directory.website}`} target="_blank" rel="noopener noreferrer">
@@ -65,13 +65,13 @@ function DirectoryDetailsPage(): React.JSX.Element {
         </a>
       </Typography>
       <Typography variant="body1">Hours: {directory.hours}</Typography>
-      <Box sx={{ mt: 2 }}>
-        <div dangerouslySetInnerHTML={{ __html: directory.iframe }} />
-      </Box>
+
       <Button
         variant="contained"
         sx={{ mt: 3 }}
-        onClick={() => { router.push(`/dashboard/directory/${directory._id}/edit`); }}
+        onClick={() => {
+          router.push(`/dashboard/directory/${directory._id}/edit`);
+        }}
       >
         Edit
       </Button>

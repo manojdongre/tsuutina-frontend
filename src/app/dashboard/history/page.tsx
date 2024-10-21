@@ -16,6 +16,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import Swal from 'sweetalert2';
+
+import UploadContainer from '@/components/dashboard/upload-container';
 
 interface HistoryItem {
   _id?: string;
@@ -29,12 +32,12 @@ interface HistoryItem {
 
 interface ApiResponse<T> {
   success: boolean;
-  data: T;
+  data: { success: boolean; data: T };
   message?: string;
 }
 
 function HistoryManagementPage(): React.JSX.Element {
-  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
+  const [historyItems, setHistoryItems] = useState<any>([]);
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [newHistoryItem, setNewHistoryItem] = useState<HistoryItem>({
@@ -77,7 +80,7 @@ function HistoryManagementPage(): React.JSX.Element {
         response = await apiService.createHistoryItem(newHistoryItem as any);
       }
 
-      if (response.success) {
+      if (response.data.success) {
         fetchHistoryItems();
         setDialogOpen(false);
         setSelectedItem(null);
@@ -85,9 +88,15 @@ function HistoryManagementPage(): React.JSX.Element {
           title: '',
           yearsFrom: 0,
           yearsUpto: 0,
-          imageUrl: '', // Change from image to imageUrl
+          imageUrl: '',
           description: '',
           index: 0,
+        });
+        Swal.fire({
+          title: 'History Item Saved',
+          text: 'The history item has been saved successfully.',
+          icon: 'success',
+          confirmButtonText: 'Okay',
         });
       } else {
         setError(response.message || 'Failed to save history item');
@@ -104,8 +113,14 @@ function HistoryManagementPage(): React.JSX.Element {
   const handleDelete = async (id: string) => {
     try {
       const response = await apiService.deleteHistoryItem(id);
-      if (response.success) {
+      if (response) {
         fetchHistoryItems();
+        Swal.fire({
+          title: 'History Item Deleted',
+          text: 'The history item has been deleted successfully.',
+          icon: 'success',
+          confirmButtonText: 'Okay',
+        });
       } else {
         setError(response.message || 'Failed to delete history item');
       }
@@ -115,6 +130,23 @@ function HistoryManagementPage(): React.JSX.Element {
       } else {
         setError('An unknown error occurred');
       }
+    }
+  };
+
+  const handleImageUploadSuccess = async (url: string) => {
+    console.log('Uploaded Image URL:', url);
+    if (selectedItem) {
+      // If an item is being edited, update the selectedItem
+      setSelectedItem((prevItem) => (prevItem ? { ...prevItem, imageUrl: url } : null));
+    } else {
+      Swal.fire({
+        title: 'Image Upload Success',
+        text: 'The image has been uploaded successfully.',
+        icon: 'success',
+        confirmButtonText: 'Okay',
+      });
+      // If a new item is being added, update the newHistoryItem
+      setNewHistoryItem((prevNewItem) => ({ ...prevNewItem, imageUrl: url }));
     }
   };
 
@@ -132,10 +164,12 @@ function HistoryManagementPage(): React.JSX.Element {
         </Box>
       </Stack>
 
-      {historyItems?.data?.map((item) => (
+      {historyItems?.data?.length === 0 && <Typography>No history items found</Typography>}
+
+      {historyItems?.data?.map((item: any) => (
         <Card key={item._id} sx={{ mb: 2, p: 2 }}>
           <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
-            <img src={item.imageUrl} alt={item.title} width={150} height={150} style={{ borderRadius: '12px' }} />
+            <img src={item?.imageUrl} alt={item.title} width={150} height={150} style={{ borderRadius: '12px' }} />
             <Box>
               <Typography variant="h6" fontWeight={600}>
                 {item.title}
@@ -217,19 +251,10 @@ function HistoryManagementPage(): React.JSX.Element {
               }
             }}
           />
-          <TextField
-            margin="dense"
-            label="Image URL"
-            fullWidth
-            value={selectedItem ? selectedItem.imageUrl : newHistoryItem.imageUrl} // Change from image to imageUrl
-            onChange={(e) => {
-              if (selectedItem) {
-                setSelectedItem({ ...selectedItem, imageUrl: e.target.value });
-              } else {
-                setNewHistoryItem({ ...newHistoryItem, imageUrl: e.target.value });
-              }
-            }}
-          />
+
+          {/* UploadContainer component */}
+          <UploadContainer uploadType="history" onUploadSuccess={handleImageUploadSuccess} />
+
           <TextField
             margin="dense"
             label="Description"

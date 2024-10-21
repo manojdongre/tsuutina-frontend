@@ -30,30 +30,29 @@ interface ApiResponse<T> {
 export default function LayoutDetails(): React.JSX.Element {
   const router = useRouter();
   const { id } = useParams();
-  const [layout, setLayout] = useState<Layout | null>(null);
+  const [layout, setLayout] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleToggleRouteUsage = async (isCurrentlyUsed: boolean, layout_id?: string, route_id?: string) => {
-	console.log("");
     // if (route_id && layout_id) {
-      // try {
-        // const response = await apiService.updateLayoutRoute(layout_id, route_id, { isCurrentlyUsed });
-        // if (response.data.success) {
-          // setLayout((prevLayout) => {
-            // if (!prevLayout) return prevLayout;
-            // const updatedRoutes = prevLayout.routes.map((route) =>
-              // route._id === route_id ? { ...route, isCurrentlyUsed } : route
-            // );
-            // return { ...prevLayout, routes: updatedRoutes };
-          // });
-        // }
-      // } catch (err) {
-        // if (err instanceof Error) {
-          // setError(err.message);
-        // } else {
-          // setError('An unknown error occurred');
-        // }
-      // }
+    // try {
+    // const response = await apiService.updateLayoutRoute(layout_id, route_id, { isCurrentlyUsed });
+    // if (response.data.success) {
+    // setLayout((prevLayout) => {
+    // if (!prevLayout) return prevLayout;
+    // const updatedRoutes = prevLayout.routes.map((route) =>
+    // route._id === route_id ? { ...route, isCurrentlyUsed } : route
+    // );
+    // return { ...prevLayout, routes: updatedRoutes };
+    // });
+    // }
+    // } catch (err) {
+    // if (err instanceof Error) {
+    // setError(err.message);
+    // } else {
+    // setError('An unknown error occurred');
+    // }
+    // }
     // }
   };
 
@@ -91,7 +90,7 @@ export default function LayoutDetails(): React.JSX.Element {
       <Typography variant="h4" sx={{ mb: 2 }}>
         {layout?.data.name}
       </Typography>
-      {layout?.data.routes.map((route) => (
+      {layout?.data.routes.map((route: any) => (
         <Card key={route._id} sx={{ p: 2, mb: 2 }}>
           <Typography fontWeight={700}>{route.name}</Typography>
           <Typography>{route.path}</Typography>
@@ -106,7 +105,13 @@ export default function LayoutDetails(): React.JSX.Element {
           />
         </Card>
       ))}
-      <Button variant="contained" color="primary" onClick={() => { router.back(); }}>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => {
+          router.back();
+        }}
+      >
         Back
       </Button>
     </Box>
